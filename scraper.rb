@@ -29,7 +29,6 @@ def scraper
     #parse page and use Nokogiri to search through it
     unparsed_page = HTTParty.get(url)
     parsed_page = Nokogiri::HTML(unparsed_page)
-
     # searches for the tr elements inside tbody
     rows = parsed_page.css('tbody tr')
     
@@ -45,16 +44,17 @@ def scraper
             # selects correct data from each row and creates coin attributes, cleans up price data and converts to GBP
             rank: row.css('td')[1].text,
             name: row.css('td')[2].css('p')[0].text,
-            price: Money.from_amount(row.css('td')[3].text.gsub(/,/, "").slice(1..-1).to_f, "USD").exchange_to("GBP").format,
+            price: Money.from_amount(row.css('td')[3].text.gsub(/,/, "")[1..-1].to_f, "USD").exchange_to("GBP").format,
             '24hr': row.css('td')[4].text,
             '7d': row.css('td')[5].text,
-            marketCap: Money.from_amount(row.css('td')[6].css('span')[1].text.gsub(/,/, "").slice(1..-1).to_f, "USD").exchange_to("GBP").format,
-            '24hrvolume': Money.from_amount(row.css('td')[7].css('p')[0].text.gsub(/,/, "").slice(1..-1).to_f, "USD").exchange_to("GBP").format,
+            marketCap: Money.from_amount(row.css('td')[6].css('span')[1].text.gsub(/,/, "")[1..-1].to_f, "USD").exchange_to("GBP").format,
+            '24hrvolume': Money.from_amount(row.css('td')[7].css('p')[0].text.gsub(/,/, "")[1..-1].to_f, "USD").exchange_to("GBP").format,
             circulatingSupply: row.css('td')[8].text
         }
+        byebug
         # pushes coin data to output array
         coin_array << coin
-        i = i + 1
+        i += 1
 
         end
 end
